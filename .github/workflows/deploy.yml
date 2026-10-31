@@ -32,7 +32,6 @@ jobs:
       - name: Build portfolio
         run: npm run build
 
-      # Step 5: Configure SSH using Base64 secret
       - name: Configure SSH
         env:
           EC2_SSH_KEY_B64: ${{ secrets.EC2_SSH_KEY_B64 }}
@@ -44,27 +43,41 @@ jobs:
           chmod 700 ~/.ssh
 
           if [ -z "$EC2_SSH_KEY_B64" ]; then
-            echo "ERROR: EC2_SSH_KEY_B64 secret is empty or missing"
+            echo "ERROR: Base64 secret is missing"
             exit 1
           fi
 
           if [ -z "$EC2_HOST" ]; then
-            echo "ERROR: EC2_HOST secret is empty or missing"
+            echo "ERROR: EC2_HOST secret is missing"
             exit 1
           fi
 
-          printf '%s' "$EC2_SSH_KEY_B64" \
-            | base64 --decode > ~/.ssh/ec2_key
+          printf '%s' "$EC2_SSH_KEY_B64" | base64 --decode > ~/.ssh/ec2_key
 
+          # Normalize Windows line endings
+          tr -d '\r' < ~/.ssh/ec2_key > ~/.ssh/ec2_key_clean
+          mv ~/.ssh/ec2_key_clean ~/.ssh/ec2_key
           chmod 600 ~/.ssh/ec2_key
 
-          ssh-keygen -y -f ~/.ssh/ec2_key > /dev/null
+          echo "Decoded key file size:"
+          wc -c < ~/.ssh/ec2_key
 
-          ssh-keyscan -H "$EC2_HOST" \
-            >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Key file header:"
+          head -n 1 ~/.ssh/ec2_key
 
+          echo "Validating SSH private key..."
+
+          if ssh-keygen -y -f ~/.ssh/ec2_key > /dev/null 2>/tmp/ssh_error.txt; then
+            echo "SUCCESS: SSH private key is valid"
+          else
+            echo "ERROR: SSH key validation failed"
+            cat /tmp/ssh_error.txt
+            exit 1
+          fi
+
+          echo "Checking EC2 host..."
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           chmod 600 ~/.ssh/known_hosts
-
       # Step 6: Package the built website
       - name: Package portfolio
         run: |
