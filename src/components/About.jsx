@@ -46,8 +46,8 @@ export default function About({ isDark }) {
     },
     {
       icon: Target,
-      title: 'Career Goal: Cloud / DevOps Engineer',
-      description: 'Aiming to secure a Cloud or DevOps internship where I can contribute, grow, and build real-world cloud infrastructure skills.',
+      title: 'Career Goal: Cloud & DevOps Engineer ',
+      description: 'Aiming to secure carries as a Cloud or DevOps Engineer where I can contribute, grow, and build real-world cloud infrastructure skills.',
       color: '#06b6d4',
     },
     {
@@ -182,7 +182,7 @@ export default function About({ isDark }) {
               variants={fadeUp}
               className={`text-base leading-relaxed mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
             >
-              Hi! I'm Anshu — a first-year B.Tech student specializing in{' '}
+              Hi! I'm Anshu — a third-year B.Tech student specializing in{' '}
               <span className="text-purple-400 font-semibold">Cloud Technology & Information Security</span>.
               Rather than just studying theory, I build real projects to understand cloud concepts deeply.
               I've deployed on S3 and EC2, explored CI/CD, and built a computer vision project with Python.
